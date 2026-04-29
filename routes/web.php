@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\AuthController;
 use App\Models\User;
 
 /*
@@ -18,29 +19,16 @@ use App\Models\User;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+
+// rota publica
 Route::get('/', [ContactController::class, 'index'])->name('contacts.index');
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+// rotas de autenticação
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::post('/login', function (Illuminate\Http\Request $request) {
-    if ($request->email === 'admin@admin.com' && $request->password === '123456') {
-        $user = User::firstOrCreate(
-            ['email' => 'admin@admin.com'],
-            ['name' => 'Admin', 'password' => Hash::make('123456')]
-        );
-        Auth::login($user);
-        return redirect()->route('contacts.index');
-    }
-    return back()->withErrors(['email' => 'Credenciais inválidas.']);
-})->name('login.post');
-
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect()->route('contacts.index');
-})->name('logout');
-
-Route::middleware(['auth'])->group(function () {
-    Route::resource('contacts', ContactController::class)->except(['index']);
+// rotas protegidas por login
+Route::middleware('auth')->group(function () {
+    Route::resource('contacts', ContactController::class)->except('index');
 });
