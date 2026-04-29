@@ -28,4 +28,15 @@ class ContactRequest extends FormRequest
         'email' => 'required|email|unique:contacts,email,' . $this->route('contact'),
     ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'name.min' => 'O nome deve ter pelo menos 6 caracteres.',
+            'contact.digits' => 'O contato deve ter exatamente 9 dígitos.',
+            'contact.unique' => 'Este número de contato já está cadastrado.',
+            'email.email' => 'Insira um endereço de e-mail válido.',
+            'email.unique' => 'Este e-mail já está em uso.',
+        ];
+    }
 }
